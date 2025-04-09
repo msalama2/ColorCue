@@ -1,42 +1,9 @@
 import random, sys, time, pygame
 from pygame.locals import K_q, K_w, K_e, K_a, K_s, K_d, QUIT, KEYDOWN, KEYUP, MOUSEBUTTONUP, K_ESCAPE
 import pyttsx3
-import threading  # Import threading
-import queue  # To handle queued voiceover tasks
-
-# Initialize the pyttsx3 engine
 engine = pyttsx3.init()
 rate = engine.getProperty('rate')
 engine.setProperty('rate', rate - 25)
-
-# Queue to store voiceover tasks
-voiceover_queue = queue.Queue()
-
-# Thread to process voiceover tasks
-def processVoiceOvers():
-    while True:
-        key = voiceover_queue.get()  # Get the next voiceover task
-        if key is None:  # None is used as a signal to stop the thread
-            break
-        
-        if key == YELLOW:
-            engine.say("Q")
-        elif key == BLUE:
-            engine.say("W")
-        elif key == RED:
-            engine.say("A")
-        elif key == GREEN:
-            engine.say("S")
-        elif key == ORANGE:
-            engine.say("E")
-        elif key == PURPLE:
-            engine.say("D")
-        
-        engine.runAndWait()
-
-# Start the voiceover processing thread once at the beginning
-voiceover_thread = threading.Thread(target=processVoiceOvers, daemon=True)
-voiceover_thread.start()
 
 FPS = 30
 WINDOWWIDTH = 700
@@ -97,32 +64,41 @@ def flashButtonAnimation(color, animationSpeed=50):
     if color == YELLOW:
         flashColor = BRIGHTYELLOW
         rectangle = YELLOWRECT
+        engine.say("Q")
+        engine.runAndWait()
     elif color == BLUE:
         flashColor = BRIGHTBLUE
         rectangle = BLUERECT
+        engine.say("W")
+        engine.runAndWait()
     elif color == RED:
         flashColor = BRIGHTRED
         rectangle = REDRECT
+        engine.say("A")
+        engine.runAndWait()
     elif color == GREEN:
         flashColor = BRIGHTGREEN
         rectangle = GREENRECT
+        engine.say("S")
+        engine.runAndWait()
     elif color == ORANGE:
         flashColor = BRIGHTORANGE
         rectangle = ORANGERECT
+        engine.say("E")
+        engine.runAndWait()
     elif color == PURPLE:
         flashColor = BRIGHTPURPLE
-        rectangle = PURPLERECT
+        rectangle = PURPLE
+        engine.say("D")
+        engine.runAndWait()
 
     origSurf = DISPLAYSURF.copy()
     flashSurf = pygame.Surface((BUTTONSIZE, BUTTONSIZE))
     flashSurf = flashSurf.convert_alpha()
     r, g, b = flashColor
-    voiceover_queue.put(color)
-    # Flash animation loop
     for start, end, step in ((0, 255, 1), (255, 0, -1)):  # animation loop
         for alpha in range(start, end, animationSpeed * step):
             checkForQuit()
-            pygame.time.delay(75)
             DISPLAYSURF.blit(origSurf, (0, 0))
             flashSurf.fill((r, g, b, alpha))
             DISPLAYSURF.blit(flashSurf, rectangle.topleft)
@@ -174,13 +150,14 @@ def main():
     pygame.display.set_caption('Simulate')
 
     BASICFONT = pygame.font.Font('freesansbold.ttf', 16)
-    infoSurf = BASICFONT.render('Match the pattern by clicking on the button or using the Q, W, E, A, S, D keys.', 1, WHITE)
+    infoSurf = BASICFONT.render('Match the pattern by clicking on the button or using the Q, W, A, S, D keys.', 1, WHITE)
     infoRect = infoSurf.get_rect()
     infoRect.topleft = (10, WINDOWHEIGHT - 25)
 
-    pattern = []
-    currentStep = 0
-    lastClickTime = 0
+    # Initialize some variables for a new game
+    pattern = []  # stores the pattern of colors
+    currentStep = 0  # the color the player must push next
+    lastClickTime = 0  # timestamp of the player's last button push
     score = 0
     # when False, the pattern is playing. when True, waiting for the player to click a colored button:
     waitingForInput = False
@@ -188,7 +165,8 @@ def main():
     while True:  # main game loop
         clickedButton = None  # button that was clicked (set to YELLOW, RED, GREEN, BLUE, ORANGE)
         DISPLAYSURF.fill(bgColor)
-        drawButtons()
+        drawButtons()  # Function call here
+
         scoreSurf = BASICFONT.render('Score: ' + str(score), 1, WHITE)
         scoreRect = scoreSurf.get_rect()
         scoreRect.topleft = (WINDOWWIDTH - 100, 10)
@@ -206,11 +184,11 @@ def main():
                     clickedButton = YELLOW
                 elif event.key == K_w:
                     clickedButton = BLUE
-                elif event.key == K_a:
-                    clickedButton = RED
-                elif event.key == K_s:
-                    clickedButton = GREEN
                 elif event.key == K_e:
+                    clickedButton = RED
+                elif event.key == K_a:
+                    clickedButton = GREEN
+                elif event.key == K_s:
                     clickedButton = ORANGE
                 elif event.key == K_d:
                     clickedButton = PURPLE
@@ -254,6 +232,8 @@ def main():
 def terminate():
     pygame.quit()
     sys.exit()
+
+# Other functions remain unchanged...
 
 if __name__ == '__main__':
     main()
