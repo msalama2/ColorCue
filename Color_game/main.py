@@ -88,9 +88,11 @@ def flashButtonAnimation(color, animationSpeed=50):
         engine.runAndWait()
     elif color == PURPLE:
         flashColor = BRIGHTPURPLE
-        rectangle = PURPLE
-        engine.say("D")
-        engine.runAndWait()
+        rectangle = PURPLERECT
+    else:
+        # notify of invalid color 
+        raise ValueError(f"Invalid color: {color}")
+
 
     origSurf = DISPLAYSURF.copy()
     flashSurf = pygame.Surface((BUTTONSIZE, BUTTONSIZE))
@@ -108,8 +110,6 @@ def flashButtonAnimation(color, animationSpeed=50):
 
 # Define checkForQuit function before main
 def checkForQuit():
-    for event in pygame.event.get(QUIT):  # get all the QUIT events
-        terminate()  # terminate if any QUIT events are present
     for event in pygame.event.get(KEYUP):  # get all the KEYUP events
         if event.key == K_ESCAPE:
             terminate()  # terminate if the KEYUP event was for the Esc key
@@ -230,6 +230,7 @@ def main():
         FPSCLOCK.tick(FPS)
 
 def terminate():
+    voiceover_queue.put(None)
     pygame.quit()
     sys.exit()
 
