@@ -245,7 +245,7 @@ def start_game():
     pattern = []
     current_step = 0
     score = 0
-
+    
 # Function to display the score
 def display_score(display, font, score):
     score_surf = font.render(f"Score: {score}", True, WHITE)
