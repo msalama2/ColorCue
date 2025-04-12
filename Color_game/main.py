@@ -218,8 +218,12 @@ def handle_events():
 def handle_keydown(event):
     global tutorial_playing, game_started, pattern, current_step, score, waiting_for_input
     if event.key == K_t:
-        tutorial.play()
+        tutorial.stop() # Stop the tutorial sound so it doesn't overlap
+        tutorial.play() 
         tutorial_playing = True
+    elif event.key == K_ESCAPE: # Exit the game if escape is pressed
+        pygame.quit()
+        sys.exit()
     elif event.key == K_SPACE:
         start_game()
     elif game_started:
@@ -257,12 +261,12 @@ def run_game_logic(display, fpsclock, clicked):
 
 # Function to generate the pattern
 def generate_pattern(display, fpsclock):
-    global pattern, waiting_for_input
-    pygame.display.update()
-    pygame.time.wait(1000)
-    pattern.append(random.choice(list(COLOR_KEY_MAP.keys())))
-    for btn in pattern:
-        flash_button(display, btn, fpsclock, play_sound=True)
+    global pattern, waiting_for_input # Use global variables so we can modify them
+    pygame.display.update() 
+    pygame.time.wait(1000) # Wait for 1 second
+    pattern.append(random.choice(list(COLOR_KEY_MAP.keys()))) # Add a new color to the pattern
+    for btn in pattern: # Flash each color in the pattern
+        flash_button(display, btn, fpsclock, play_sound=True) # Play sound, flash button
         pygame.time.wait(FLASHDELAY)
     waiting_for_input = True
 
