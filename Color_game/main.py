@@ -2,8 +2,8 @@ import sys
 import pygame
 from pygame.locals import *
 import random
-from color_game.sound import *
-from color_game.config import *
+from sound import *
+from config import *
 
 def draw_buttons(surface):
     for color, rect in RECT_MAP.items():
