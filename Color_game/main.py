@@ -5,6 +5,9 @@ import random
 from sound import *
 from config import *
 
+# detects if the game is paused
+is_paused = True
+
 def draw_buttons(surface):
     for color, rect in RECT_MAP.items():
         pygame.draw.rect(surface, color, rect)
@@ -50,29 +53,34 @@ def game_over_animation(surface, fpsclock, color=WHITE, speed=50):
                 fpsclock.tick(FPS)
 
 def main():
-    global score, pattern, current_step, waiting_for_input, game_started, tutorial_playing
+    global score, pattern, current_step, waiting_for_input, game_started, tutorial_playing, is_paused
     score = 0
     pattern = []
     current_step = 0
     waiting_for_input = False
     game_started = False
     tutorial_playing = False
+    is_paused = True
 
     pygame.init()
     fpsclock = pygame.time.Clock()
     display = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
-    pygame.display.set_caption('Accessible Pattern Game')
+    pygame.display.set_caption('ColorCue')
     font = pygame.font.Font(None, 28)
     initialize_game()
 
     while True:
         clicked = handle_events()
         display.fill(bgColor)
-        draw_buttons(display)
-        display_score(display, font, score)
 
-        if game_started:
-            run_game_logic(display, fpsclock, clicked)
+        if is_paused:
+            draw_pause_menu(display)
+        else:
+            draw_buttons(display)
+            display_score(display, font, score)
+
+            if game_started:
+                run_game_logic(display, fpsclock, clicked)
 
         pygame.display.update()
         fpsclock.tick(FPS)
@@ -99,17 +107,22 @@ def handle_events():
     return clicked
 
 def handle_keydown(event):
-    global tutorial_playing, game_started, pattern, current_step, score, waiting_for_input
+    global tutorial_playing, game_started, pattern, current_step, score, waiting_for_input, is_paused
     if event.key == K_t:
-        tutorial.stop() # Stop the tutorial sound so it doesn't overlap
-        tutorial.play() 
+        tutorial.stop()
+        tutorial.play()
         tutorial_playing = True
-    elif event.key == K_ESCAPE: # Exit the game if escape is pressed
+    elif event.key == K_ESCAPE:
         pygame.quit()
         sys.exit()
     elif event.key == K_SPACE:
-        start_game()
-    elif game_started:
+        if is_paused:
+            start_game()
+            is_paused = False
+        else:
+            is_paused = True
+            paused.play()
+    elif game_started and not is_paused:
         for col, key in COLOR_KEY_MAP.items():
             if event.key == ord(key.lower()):
                 return col
@@ -127,8 +140,6 @@ def start_game():
     pattern = []
     current_step = 0
     score = 0
-    
-# Function to display the score
 
 def display_score(display, font, score):
     score_surf = font.render(f"Score: {score}", True, WHITE)
@@ -142,12 +153,12 @@ def run_game_logic(display, fpsclock, clicked):
         process_input(display, fpsclock, clicked)
 
 def generate_pattern(display, fpsclock):
-    global pattern, waiting_for_input # Use global variables so we can modify them
-    pygame.display.update() 
-    pygame.time.wait(1000) # Wait for 1 second
-    pattern.append(random.choice(list(COLOR_KEY_MAP.keys()))) # Add a new color to the pattern
-    for btn in pattern: # Flash each color in the pattern
-        flash_button(display, btn, fpsclock, play_sound=True) # Play sound, flash button
+    global pattern, waiting_for_input
+    pygame.display.update()
+    pygame.time.wait(1000)
+    pattern.append(random.choice(list(COLOR_KEY_MAP.keys())))
+    for btn in pattern:
+        flash_button(display, btn, fpsclock, play_sound=True)
         pygame.time.wait(FLASHDELAY)
     waiting_for_input = True
 
@@ -179,6 +190,15 @@ def handle_incorrect_input(display, fpsclock):
     waiting_for_input = False
     score = 0
     pygame.time.wait(2000)
+
+def draw_pause_menu(surface):
+    surface.fill(bgColor)
+    draw_buttons(surface)
+    font = pygame.font.Font(None, 48)
+    text = font.render("Press SPACE to Start / Resume", True, WHITE)
+    rect = text.get_rect(center=(WINDOWWIDTH // 2, WINDOWHEIGHT // 2))
+    surface.blit(text, rect)
+
 
 if __name__ == '__main__':
     main()
