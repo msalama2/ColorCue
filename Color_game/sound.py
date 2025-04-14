@@ -1,9 +1,4 @@
-import pyttsx3
 import pygame
-
-# Initialize TTS engine
-engine = pyttsx3.init()
-engine.setProperty('rate', engine.getProperty('rate') - 25)
 
 # Sound loading
 pygame.mixer.init()
@@ -11,7 +6,9 @@ welcome_sound = pygame.mixer.Sound("assets/tutorial/welcome_to_colorcue.mp3")
 listen_tutorial = pygame.mixer.Sound("assets/tutorial/listen_tutorial_sound.mp3")
 startgame_sound = pygame.mixer.Sound("assets/tutorial/start_game_sound.mp3")
 tutorial = pygame.mixer.Sound("assets/tutorial/tutorial.mp3")
-pygame.mixer.music.load("assets/music/Moog City.mp3")
+paused = pygame.mixer.Sound("assets/sounds/paused_sound.mp3")
+pygame.mixer.music.load("assets/music/mellow_background_music.mp3")
+pygame.mixer.music.set_volume(0.1)
 
 correct_chime = pygame.mixer.Sound("assets/sounds/correct_sound.wav")
 incorrect_chime = pygame.mixer.Sound("assets/sounds/incorrect_sound.mp3")
@@ -24,10 +21,6 @@ w_sound = pygame.mixer.Sound("assets/sounds/w_sound.mp3")
 gameover_sound = pygame.mixer.Sound("assets/sounds/gameover_sound.mp3")
 
 # Functions
-def speak(text):
-    engine.say(text)
-    engine.runAndWait()
-
 def play_key_sound(key):
     key = key.upper()
     if key == 'A':
