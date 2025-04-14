@@ -1,9 +1,4 @@
-import pyttsx3
 import pygame
-
-# Initialize TTS engine
-engine = pyttsx3.init()
-engine.setProperty('rate', engine.getProperty('rate') - 25)
 
 # Sound loading
 pygame.mixer.init()
@@ -24,10 +19,6 @@ w_sound = pygame.mixer.Sound("assets/sounds/w_sound.mp3")
 gameover_sound = pygame.mixer.Sound("assets/sounds/gameover_sound.mp3")
 
 # Functions
-def speak(text):
-    engine.say(text)
-    engine.runAndWait()
-
 def play_key_sound(key):
     key = key.upper()
     if key == 'A':
